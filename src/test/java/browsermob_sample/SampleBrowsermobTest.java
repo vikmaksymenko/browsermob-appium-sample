@@ -1,5 +1,6 @@
 package browsermob_sample;
 
+import browsermob_sample.utils.BrowserMobHelper;
 import com.codeborne.selenide.WebDriverRunner;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.remote.AndroidMobileCapabilityType;
@@ -47,6 +48,8 @@ public class SampleBrowsermobTest {
                         new File("src/test/resources/browsermob_sample/app-debug.apk").getAbsolutePath());
 
         WebDriverRunner.setWebDriver(new AndroidDriver(appiumService.getUrl(), caps));
+
+        BrowserMobHelper.getInstance().startProxy();
     }
 
     @Test
@@ -59,6 +62,7 @@ public class SampleBrowsermobTest {
 
     @AfterClass(alwaysRun = true)
     public void tearDown() {
+        BrowserMobHelper.getInstance().stopProxy();
         appiumService.stop();
     }
 }
