@@ -7,6 +7,7 @@ import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServerHasNotBeenStartedLocallyException;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
+import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.context.annotation.Description;
 import org.testng.annotations.AfterClass;
@@ -17,6 +18,7 @@ import java.io.File;
 
 import static com.codeborne.selenide.Condition.exist;
 import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$x;
 
 public class SampleBrowsermobTest {
@@ -36,7 +38,7 @@ public class SampleBrowsermobTest {
         DesiredCapabilities caps = new DesiredCapabilities();
 
         caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UiAutomator2");
-        caps.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
+        caps.setCapability(MobileCapabilityType.DEVICE_NAME, "Y15HFBP8228WA");
         caps.setCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS, true);
         caps.setCapability("allowTestPackages", true);
 
@@ -50,6 +52,7 @@ public class SampleBrowsermobTest {
     @Test
     @Description("JetBrains Kotlin should be in list")
     public void jetBrainsKotlinShouldBeInList() {
+        $(By.id("com.raywenderlich.githubrepolist:id/refreshButton")).shouldBe(visible).click();
         $x("//android.widget.TextView[@resource-id='com.raywenderlich.githubrepolist:id/repoName' and @text='JetBrains/kotlin']")
                 .waitUntil(exist, 30 * 1000).shouldBe(visible);
     }
