@@ -2,6 +2,8 @@ package browsermob_sample.utils;
 
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
+import net.lightbody.bmp.core.har.Har;
+import net.lightbody.bmp.proxy.CaptureType;
 
 public class BrowserMobHelper {
     private static BrowserMobHelper ourInstance = new BrowserMobHelper();
@@ -23,5 +25,18 @@ public class BrowserMobHelper {
         proxy.stop();
         proxy = null;
         System.out.println("===== Proxy is stopped =====");
+    }
+
+    public BrowserMobHelper startRecording() {
+        proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
+        proxy.newHar();
+        return this;
+    }
+
+    public Har stopRecording() {
+        if(proxy.getHar() != null) {
+            return proxy.endHar();
+        }
+        return null;
     }
 }

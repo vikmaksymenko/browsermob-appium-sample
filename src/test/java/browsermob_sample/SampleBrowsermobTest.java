@@ -8,6 +8,9 @@ import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServerHasNotBeenStartedLocallyException;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
+import net.lightbody.bmp.core.har.Har;
+import net.lightbody.bmp.core.har.HarEntry;
+import net.lightbody.bmp.core.har.HarRequest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.context.annotation.Description;
@@ -16,6 +19,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 import static com.codeborne.selenide.Condition.exist;
 import static com.codeborne.selenide.Condition.visible;
@@ -48,16 +52,20 @@ public class SampleBrowsermobTest {
                         new File("src/test/resources/browsermob_sample/app-debug.apk").getAbsolutePath());
 
         WebDriverRunner.setWebDriver(new AndroidDriver(appiumService.getUrl(), caps));
-
-        BrowserMobHelper.getInstance().startProxy();
     }
 
     @Test
     @Description("JetBrains Kotlin should be in list")
-    public void jetBrainsKotlinShouldBeInList() {
+    public void jetBrainsKotlinShouldBeInList() throws IOException {
+        BrowserMobHelper.getInstance().startProxy().startRecording();
         $(By.id("com.raywenderlich.githubrepolist:id/refreshButton")).shouldBe(visible).click();
         $x("//android.widget.TextView[@resource-id='com.raywenderlich.githubrepolist:id/repoName' and @text='JetBrains/kotlin']")
                 .waitUntil(exist, 30 * 1000).shouldBe(visible);
+        serializeRequests(BrowserMobHelper.getInstance().stopRecording());
+    }
+
+    private void serializeRequests(Har records) throws IOException {
+        records.writeTo(new File("sample.har"));
     }
 
     @AfterClass(alwaysRun = true)
