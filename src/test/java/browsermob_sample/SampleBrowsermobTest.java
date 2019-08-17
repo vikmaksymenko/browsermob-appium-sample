@@ -30,7 +30,7 @@ public class SampleBrowsermobTest {
 
     @BeforeMethod
     public void setup() {
-        bmpHelper.startRecording();
+        bmpHelper.overwriteGitHubResponse().startRecording();
 
         AppiumServiceBuilder appiumServiceBuilder = new AppiumServiceBuilder();
         appiumService = appiumServiceBuilder.withIPAddress("127.0.0.1").build();
@@ -54,13 +54,16 @@ public class SampleBrowsermobTest {
         WebDriverRunner.setWebDriver(new AndroidDriver(appiumService.getUrl(), caps));
     }
 
-    @Test
-    @Description("JetBrains Kotlin should be in list")
-    public void jetBrainsKotlinShouldBeInList() {
+    @Test()
+    @Description("JetBrains Kotlin shouldn't be in list, if response is overwritted")
+    public void jetBrainsKotlinShouldNotBeInListIfResponseIsOverwritted() {
         $(By.id("com.raywenderlich.githubrepolist:id/refreshButton")).shouldBe(visible).click();
-        $x("//android.widget.TextView[@resource-id='com.raywenderlich.githubrepolist:id/repoName' and @text='JetBrains/kotlin']")
+        $x("//android.widget.TextView[@resource-id='com.raywenderlich.githubrepolist:id/repoName' and @text='JetBrains/shmotlin']")
                 .waitUntil(exist, 30 * 1000).shouldBe(visible);
+        $x("//android.widget.TextView[@resource-id='com.raywenderlich.githubrepolist:id/repoName' and @text='JetBrains/kotlin']")
+                .shouldNot(exist);
     }
+
 
     @AfterMethod(alwaysRun = true)
     public void tearDown() throws IOException {

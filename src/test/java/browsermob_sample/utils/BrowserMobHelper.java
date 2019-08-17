@@ -38,4 +38,15 @@ public class BrowserMobHelper {
         }
         return null;
     }
+
+    public BrowserMobHelper overwriteGitHubResponse() {
+        proxy.addResponseFilter((response, contents, messageInfo) -> {
+            if (messageInfo.getUrl().contains("https://api.github.com/search/repositories")
+                    && messageInfo.getUrl().contains("kotlin")) {
+                contents.setTextContents(contents.getTextContents().replace("kotlin", "shmotlin"));
+            }
+        });
+
+        return this;
+    }
 }
