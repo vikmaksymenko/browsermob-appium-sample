@@ -8,14 +8,11 @@ import io.appium.java_client.remote.MobileCapabilityType;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServerHasNotBeenStartedLocallyException;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
-import net.lightbody.bmp.core.har.Har;
-import net.lightbody.bmp.core.har.HarEntry;
-import net.lightbody.bmp.core.har.HarRequest;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.springframework.context.annotation.Description;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -29,9 +26,12 @@ import static com.codeborne.selenide.Selenide.$x;
 public class SampleBrowsermobTest {
 
     private AppiumDriverLocalService appiumService;
+    private BrowserMobHelper bmpHelper = BrowserMobHelper.getInstance();
 
-    @BeforeClass
+    @BeforeMethod
     public void setup() {
+        bmpHelper.startRecording();
+
         AppiumServiceBuilder appiumServiceBuilder = new AppiumServiceBuilder();
         appiumService = appiumServiceBuilder.withIPAddress("127.0.0.1").build();
         appiumService.start();
@@ -43,7 +43,7 @@ public class SampleBrowsermobTest {
         DesiredCapabilities caps = new DesiredCapabilities();
 
         caps.setCapability(MobileCapabilityType.AUTOMATION_NAME, "UiAutomator2");
-        caps.setCapability(MobileCapabilityType.DEVICE_NAME, "Y15HFBP8228WA");
+        caps.setCapability(MobileCapabilityType.DEVICE_NAME, "4200da729a92641d");
         caps.setCapability(AndroidMobileCapabilityType.AUTO_GRANT_PERMISSIONS, true);
         caps.setCapability("allowTestPackages", true);
 
@@ -56,21 +56,16 @@ public class SampleBrowsermobTest {
 
     @Test
     @Description("JetBrains Kotlin should be in list")
-    public void jetBrainsKotlinShouldBeInList() throws IOException {
-        BrowserMobHelper.getInstance().startProxy().startRecording();
+    public void jetBrainsKotlinShouldBeInList() {
         $(By.id("com.raywenderlich.githubrepolist:id/refreshButton")).shouldBe(visible).click();
         $x("//android.widget.TextView[@resource-id='com.raywenderlich.githubrepolist:id/repoName' and @text='JetBrains/kotlin']")
                 .waitUntil(exist, 30 * 1000).shouldBe(visible);
-        serializeRequests(BrowserMobHelper.getInstance().stopRecording());
     }
 
-    private void serializeRequests(Har records) throws IOException {
-        records.writeTo(new File("sample.har"));
-    }
-
-    @AfterClass(alwaysRun = true)
-    public void tearDown() {
-        BrowserMobHelper.getInstance().stopProxy();
+    @AfterMethod(alwaysRun = true)
+    public void tearDown() throws IOException {
+        bmpHelper.stopRecording().writeTo(new File("sample.har"));
+        bmpHelper.stopProxy();
         appiumService.stop();
     }
 }
